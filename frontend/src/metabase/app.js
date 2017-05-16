@@ -38,6 +38,8 @@ function _init(reducers, getRoutes, callback) {
     const routes = getRoutes(store);
     const history = syncHistoryWithStore(browserHistory, store);
 
+    window.store = store
+
     ReactDOM.render(
         <Provider store={store}>
           <Router history={history}>

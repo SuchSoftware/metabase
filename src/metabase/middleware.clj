@@ -193,7 +193,7 @@
                                                                     "https://*.googleapis.com"
                                                                     "*.gstatic.com"
                                                                     (when config/is-dev?
-                                                                      "localhost:8080")]
+                                                                      "devmachine:8080")]
                                                       :child-src   ["'self'"
                                                                     "https://accounts.google.com"] ; TODO - double check that we actually need this for Google Auth
                                                       :style-src   ["'unsafe-inline'"
@@ -203,13 +203,13 @@
                                                                     "fonts.gstatic.com"
                                                                     "themes.googleusercontent.com"
                                                                     (when config/is-dev?
-                                                                      "localhost:8080")]
+                                                                      "devmachine:8080")]
                                                       :img-src     ["*"
                                                                     "'self' data:"]
                                                       :connect-src ["'self'"
                                                                     "metabase.us10.list-manage.com"
                                                                     (when config/is-dev?
-                                                                      "localhost:8080 ws://localhost:8080")]}]
+                                                                      "devmachine:8080 ws://devmachine:8080")]}]
                                           (format "%s %s; " (name k) (apply str (interpose " " vs)))))})
 
 (defsetting ssl-certificate-public-key

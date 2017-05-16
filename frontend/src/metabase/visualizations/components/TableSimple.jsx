@@ -17,6 +17,8 @@ import _ from "underscore";
 
 import type { VisualizationProps } from "metabase/meta/types/Visualization";
 
+import { withFilters } from '../../filters'
+
 type Props = VisualizationProps & {
     height: number,
     className?: string
@@ -30,7 +32,7 @@ type State = {
 }
 
 @ExplicitSize
-export default class TableSimple extends Component<*, Props, State> {
+class TableSimple extends Component<*, Props, State> {
     state: State;
 
     constructor(props: Props) {
@@ -40,7 +42,8 @@ export default class TableSimple extends Component<*, Props, State> {
             page: 0,
             pageSize: 1,
             sortColumn: null,
-            sortDescending: false
+            sortDescending: false,
+            filters: []
         }
     }
 
@@ -70,11 +73,22 @@ export default class TableSimple extends Component<*, Props, State> {
         }
     }
 
+    filterOn(colIndex, value) {
+        const { data: { cols } } = this.props
+
+          console.log('going to filter', colIndex, value)
+
+        this.props.addFilter(cols[colIndex], value)
+    }
+
     render() {
         const { data } = this.props;
         const { page, pageSize, sortColumn, sortDescending } = this.state;
 
         let { rows, cols } = data;
+        console.log('example row', rows[0])
+
+        rows = rows.filter(this.props.filterData(cols))
 
         let start = pageSize * page;
         let end = Math.min(rows.length - 1, pageSize * (page + 1) - 1);
@@ -85,6 +99,9 @@ export default class TableSimple extends Component<*, Props, State> {
                 rows.reverse();
             }
         }
+
+        console.log('row', rows)
+        console.log('cols', cols)
 
         return (
             <div className={cx(this.props.className, "relative flex flex-column")}>
@@ -111,7 +128,12 @@ export default class TableSimple extends Component<*, Props, State> {
                             {rows.slice(start, end + 1).map((row, rowIndex) =>
                                 <tr key={rowIndex} ref={rowIndex === 0 ? "firstRow" : null}>
                                     {row.map((cell, colIndex) =>
-                                        <td key={colIndex} style={{ whiteSpace: "nowrap" }} className="px1 border-bottom">
+                                        <td
+                                          key={colIndex}
+                                          style={{ whiteSpace: "nowrap" }}
+                                          className="px1 border-bottom"
+                                          onClick={ () => this.filterOn(colIndex, cell) }
+                                        >
                                             { cell == null ? "-" : formatValue(cell, { column: cols[colIndex], jsx: true }) }
                                         </td>
                                     )}
@@ -136,3 +158,5 @@ export default class TableSimple extends Component<*, Props, State> {
         );
     }
 }
+
+export default withFilters(TableSimple)

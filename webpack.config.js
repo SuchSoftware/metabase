@@ -199,7 +199,7 @@ if (NODE_ENV === "hot") {
     config.output.filename = "[name].hot.bundle.js?[hash]";
 
     // point the publicPath (inlined in index.html by HtmlWebpackPlugin) to the hot-reloading server
-    config.output.publicPath = "http://localhost:8080" + config.output.publicPath;
+    config.output.publicPath = "http://devmachine:8080" + config.output.publicPath;
 
     config.module.loaders.unshift({
         test: /\.jsx$/,

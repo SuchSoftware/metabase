@@ -11,6 +11,8 @@ import requests from "metabase/redux/requests";
 import settings from "metabase/redux/settings";
 import undo from "metabase/redux/undo";
 
+import { reducer as filters } from './filters'
+
 /* user */
 import { currentUser } from "metabase/redux/user";
 
@@ -19,6 +21,7 @@ export default {
     app,
     auth,
     currentUser,
+    filters,
     metadata,
     requests,
     settings,

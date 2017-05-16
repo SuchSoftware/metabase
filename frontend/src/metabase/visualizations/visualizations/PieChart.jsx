@@ -31,9 +31,11 @@ const PERCENT_REGEX = /percent/i;
 
 import type { VisualizationProps } from "metabase/meta/types/Visualization";
 
+import { withFilters } from '../../filters'
+
 type Props = VisualizationProps;
 
-export default class PieChart extends Component<*, Props, *> {
+class PieChart extends Component<*, Props, *> {
     static uiName = "Pie";
     static identifier = "pie";
     static iconName = "pie";
@@ -90,9 +92,13 @@ export default class PieChart extends Component<*, Props, *> {
     }
 
     render() {
+        console.log('pie render', this.props.filters)
         const { series, hovered, onHoverChange, onVisualizationClick, className, gridSize, settings } = this.props;
 
         const [{ data: { cols, rows }}] = series;
+        const filteredRows = rows.filter(this.props.filterData(cols))
+        console.log('pie cols', cols)
+        console.log('pie rows', rows)
         const dimensionIndex = _.findIndex(cols, (col) => col.name === settings["pie.dimension"]);
         const metricIndex = _.findIndex(cols, (col) => col.name === settings["pie.metric"]);
 
@@ -103,13 +109,13 @@ export default class PieChart extends Component<*, Props, *> {
         const showPercentInTooltip = !PERCENT_REGEX.test(cols[metricIndex].name) && !PERCENT_REGEX.test(cols[metricIndex].display_name);
 
         // $FlowFixMe
-        let total: number = rows.reduce((sum, row) => sum + row[metricIndex], 0);
+        let total: number = filteredRows.reduce((sum, row) => sum + row[metricIndex], 0);
 
         // use standard colors for up to 5 values otherwise use color harmony to help differentiate slices
-        let sliceColors = Object.values(rows.length > 5 ? colors.harmony : colors.normal);
+        let sliceColors = Object.values(filteredRows.length > 5 ? colors.harmony : colors.normal);
         let sliceThreshold = typeof settings["pie.slice_threshold"] === "number" ? settings["pie.slice_threshold"] / 100 : SLICE_THRESHOLD;
 
-        let [slices, others] = _.chain(rows)
+        let [slices, others] = _.chain(filteredRows)
             .map((row, index) => ({
                 key: row[dimensionIndex],
                 value: row[metricIndex],
@@ -180,6 +186,8 @@ export default class PieChart extends Component<*, Props, *> {
                     event:        event
                 })
             }
+
+            this.props.addFilter(cols[dimensionIndex], slices[index].key)
         }
 
         let value, title;
@@ -230,3 +238,5 @@ export default class PieChart extends Component<*, Props, *> {
         );
     }
 }
+
+export default withFilters(PieChart)
